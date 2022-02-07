@@ -71,6 +71,7 @@ public class GameState : MonoBehaviour
 
     public void RestartGame()
     {
+        tour = CharType.circle;
         gameEnded = false;
         foreach (GameObject g in settedchars)
         {

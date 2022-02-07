@@ -18,6 +18,8 @@ public class Server : BothSide
 
     private bool connected;
 
+    private ApplicationType lastStarted = ApplicationType.client;
+
     private void Awake()
     {
         if (instance == null)
@@ -89,8 +91,7 @@ public class Server : BothSide
     private void RestartGame()
     {
         status = GameStatus.playing;
-        serverPlayAs = CharType.circle;
-        tour = ApplicationType.host;
+        StartTourLogic();
         hostIsReady = false;
         clientIsReady = false;
         GameState.instance.RestartGame();
@@ -98,6 +99,23 @@ public class Server : BothSide
         UIController.instance.SetCurrentPlayer(tour);
         StartGame();
         UIController.instance.SetLastEvent("Start game");
+        TourStatus();
+    }
+
+    private void StartTourLogic()
+    {
+        if(lastStarted == ApplicationType.host)
+        {
+            lastStarted = ApplicationType.client;
+            tour = ApplicationType.client;
+            serverPlayAs = CharType.cross;
+        }
+        else
+        {
+            lastStarted = ApplicationType.host;
+            tour = ApplicationType.host;
+            serverPlayAs = CharType.circle;
+        }
     }
 
     // client Events
@@ -149,6 +167,8 @@ public class Server : BothSide
     {
         ServerToClient.StartGame startGame = new ServerToClient.StartGame();
         startGame.youPlayAs = CharType.cross;
+        if (serverPlayAs == CharType.cross)
+            startGame.youPlayAs = CharType.circle;
         sc.SerializeAndSend(startGame, MultiplayerOptions.instance.GetIpEndPoint());
     }
 
